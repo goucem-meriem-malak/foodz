@@ -1,0 +1,271 @@
+rules_version = '2';
+
+// Foodz security rules. All permissions are enforced HERE, not in the app.
+// Roles live in users/{uid}.role. Only the project admin (Firebase console)
+// can create the first owner; the owner then promotes other users.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ================= Helpers =================
+    function signedIn() { return request.auth != null; }
+    function userDoc(uid) { return /databases/$(database)/documents/users/$(uid); }
+    function orderDoc(id) { return /databases/$(database)/documents/orders/$(id); }
+    function lockDoc(uid) { return /databases/$(database)/documents/placedLocks/$(uid); }
+    function profile() { return get(userDoc(request.auth.uid)).data; }
+    function active() {
+      return signedIn() && exists(userDoc(request.auth.uid)) && profile().blocked != true;
+    }
+    function verified() { return request.auth.token.email_verified == true; }
+    function staffRole(r) { return active() && verified() && profile().role == r; }
+    function isOwner() { return staffRole('owner'); }
+    function isAdmin() { return active() && verified() && profile().role in ['owner', 'admin']; }
+    function isChef() { return staffRole('chef'); }
+    function isCourier() { return staffRole('delivery'); }
+    function changed() { return request.resource.data.diff(resource.data).affectedKeys(); }
+
+    function validName(v) { return v is string && v.size() >= 2 && v.size() <= 60; }
+    function validPhone(v) { return v is string && v.matches('^0([567][0-9]{8}|[234][0-9]{7})$'); }
+    function localized(v) {
+      return v is map
+        && v.keys().hasOnly(['ar', 'fr', 'en'])
+        && v.keys().hasAll(['ar', 'fr', 'en'])
+        && v.ar is string && v.fr is string && v.en is string
+        && v.ar.size() <= 80 && v.fr.size() <= 80 && v.en.size() <= 80
+        && (v.ar.size() > 0 || v.fr.size() > 0 || v.en.size() > 0);
+    }
+    function localizedText(v) {
+      return v is map
+        && v.keys().hasOnly(['ar', 'fr', 'en'])
+        && v.keys().hasAll(['ar', 'fr', 'en'])
+        && v.ar is string && v.fr is string && v.en is string
+        && v.ar.size() <= 400 && v.fr.size() <= 400 && v.en.size() <= 400;
+    }
+
+    // ================= Users =================
+    function validNewProfile(d) {
+      return d.keys().hasOnly(['name', 'phone', 'email', 'role', 'blocked', 'locale', 'termsVersion', 'termsAcceptedAt', 'createdAt'])
+        && d.keys().hasAll(['name', 'phone', 'email', 'role', 'blocked', 'locale', 'termsVersion', 'termsAcceptedAt', 'createdAt'])
+        && validName(d.name)
+        && validPhone(d.phone)
+        && d.email == request.auth.token.email.lower()
+        && d.role == 'client'
+        && d.blocked == false
+        && d.locale in ['ar', 'fr', 'en']
+        && d.termsVersion is string && d.termsVersion.size() > 0 && d.termsVersion.size() <= 20
+        && d.termsAcceptedAt == request.time
+        && d.createdAt == request.time;
+    }
+    function ownProfileUpdate(uid) {
+      return signedIn() && request.auth.uid == uid && active()
+        && changed().hasOnly(['name', 'phone', 'locale', 'termsVersion', 'termsAcceptedAt'])
+        && validName(request.resource.data.name)
+        && validPhone(request.resource.data.phone)
+        && request.resource.data.locale in ['ar', 'fr', 'en']
+        && (!changed().hasAny(['termsVersion']) || request.resource.data.termsAcceptedAt == request.time);
+    }
+    function ownerRoleChange(uid) {
+      return isOwner() && uid != request.auth.uid
+        && changed().hasOnly(['role'])
+        && resource.data.role != 'owner'
+        && request.resource.data.role in ['client', 'admin', 'chef', 'delivery'];
+    }
+    function adminBlockChange(uid) {
+      return isAdmin() && uid != request.auth.uid
+        && changed().hasOnly(['blocked'])
+        && request.resource.data.blocked is bool
+        && resource.data.role == 'client';
+    }
+
+    match /users/{uid} {
+      allow get: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow list: if isAdmin();
+      allow create: if signedIn() && request.auth.uid == uid && validNewProfile(request.resource.data);
+      allow update: if ownProfileUpdate(uid) || ownerRoleChange(uid) || adminBlockChange(uid);
+      allow delete: if signedIn() && request.auth.uid == uid;
+
+      // Push tokens. Only the owner of the account can write them.
+      // The push server reads them with a service account (bypasses rules).
+      match /devices/{token} {
+        allow read: if signedIn() && request.auth.uid == uid;
+        allow create, update: if signedIn() && request.auth.uid == uid && active()
+          && request.resource.data.keys().hasOnly(['platform', 'updatedAt'])
+          && request.resource.data.keys().hasAll(['platform', 'updatedAt'])
+          && request.resource.data.platform in ['android', 'web']
+          && request.resource.data.updatedAt == request.time;
+        allow delete: if signedIn() && request.auth.uid == uid;
+      }
+    }
+
+    // ================= Menu (public read, admin write) =================
+    function validCategory(d) {
+      return d.keys().hasOnly(['name', 'order', 'active'])
+        && d.keys().hasAll(['name', 'order', 'active'])
+        && localized(d.name)
+        && d.order is int
+        && d.active is bool;
+    }
+    function validDish(d) {
+      return d.keys().hasOnly(['name', 'description', 'price', 'categoryId', 'imageUrl', 'available', 'options', 'prepMinutes', 'order', 'updatedAt'])
+        && d.keys().hasAll(['name', 'price', 'categoryId', 'available', 'updatedAt'])
+        && localized(d.name)
+        && (!('description' in d) || localizedText(d.description))
+        && d.price is int && d.price >= 0 && d.price <= 1000000
+        && d.categoryId is string && d.categoryId.size() > 0 && d.categoryId.size() <= 40
+        && (!('imageUrl' in d) || (d.imageUrl is string && d.imageUrl.size() <= 500 && d.imageUrl.matches('^https://.*')))
+        && d.available is bool
+        && (!('options' in d) || (d.options is list && d.options.size() <= 12))
+        && (!('prepMinutes' in d) || (d.prepMinutes is int && d.prepMinutes >= 0 && d.prepMinutes <= 240))
+        && (!('order' in d) || d.order is int)
+        && d.updatedAt == request.time;
+    }
+
+    match /categories/{id} {
+      allow read: if true;
+      allow create, update: if isAdmin() && validCategory(request.resource.data);
+      allow delete: if isAdmin();
+    }
+    match /dishes/{id} {
+      allow read: if true;
+      allow create, update: if isAdmin() && validDish(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // ================= Restaurant settings (public read, owner write) =================
+    function validSettings(d) {
+      return d.keys().hasOnly(['restaurantName', 'deliveryFee', 'minOrder', 'defaultPrepMinutes', 'acceptingOrders', 'contactPhone', 'contactEmail', 'updatedAt'])
+        && d.keys().hasAll(['restaurantName', 'deliveryFee', 'minOrder', 'defaultPrepMinutes', 'acceptingOrders', 'contactPhone', 'contactEmail', 'updatedAt'])
+        && d.restaurantName is string && d.restaurantName.size() >= 1 && d.restaurantName.size() <= 60
+        && d.deliveryFee is int && d.deliveryFee >= 0 && d.deliveryFee <= 10000
+        && d.minOrder is int && d.minOrder >= 0 && d.minOrder <= 100000
+        && d.defaultPrepMinutes is int && d.defaultPrepMinutes >= 5 && d.defaultPrepMinutes <= 120
+        && d.acceptingOrders is bool
+        && d.contactPhone is string && d.contactPhone.size() <= 20
+        && d.contactEmail is string && d.contactEmail.size() <= 100
+        && d.updatedAt == request.time;
+    }
+    match /settings/{docId} {
+      allow read: if docId == 'app';
+      allow create, update: if docId == 'app' && isOwner() && validSettings(request.resource.data);
+    }
+
+    // ================= One unconfirmed order per customer =================
+    // The lock is created together with the order and must be deleted in the
+    // same batch that moves the order out of "placed".
+    match /placedLocks/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow create: if active() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['orderId'])
+        && request.resource.data.orderId is string
+        && existsAfter(orderDoc(request.resource.data.orderId))
+        && getAfter(orderDoc(request.resource.data.orderId)).data.clientUid == uid
+        && getAfter(orderDoc(request.resource.data.orderId)).data.status == 'placed';
+      allow delete: if signedIn() && (request.auth.uid == uid || isAdmin())
+        && getAfter(orderDoc(resource.data.orderId)).data.status != 'placed';
+    }
+
+    // ================= Orders =================
+    // Statuses: placed -> confirmed -> preparing -> ready -> out_for_delivery -> delivered
+    //           placed -> rejected | cancelled; admin can cancel before delivery.
+    function validNewOrder(d, orderId) {
+      return d.keys().hasOnly(['clientUid', 'code', 'status', 'items', 'subtotal', 'deliveryFee', 'total', 'area', 'note', 'createdAt', 'confirmedAt', 'confirmedBy', 'prepMinutes', 'readyAt', 'courierUid', 'rejectReason', 'updatedAt'])
+        && d.keys().hasAll(['clientUid', 'code', 'status', 'items', 'subtotal', 'deliveryFee', 'total', 'area', 'note', 'createdAt', 'confirmedAt', 'confirmedBy', 'prepMinutes', 'readyAt', 'courierUid', 'rejectReason', 'updatedAt'])
+        && d.clientUid == request.auth.uid
+        && d.status == 'placed'
+        && d.code is string && d.code.size() >= 4 && d.code.size() <= 8
+        && d.items is list && d.items.size() >= 1 && d.items.size() <= 40
+        && d.subtotal is int && d.subtotal >= 0
+        && d.deliveryFee is int && d.deliveryFee >= 0
+        && d.total is int && d.total == d.subtotal + d.deliveryFee && d.total <= 1000000
+        && d.area is string && d.area.size() >= 2 && d.area.size() <= 60
+        && d.note is string && d.note.size() <= 300
+        && d.createdAt == request.time && d.updatedAt == request.time
+        && d.confirmedAt == null && d.confirmedBy == null && d.prepMinutes == null
+        && d.readyAt == null && d.courierUid == null && d.rejectReason == null
+        && existsAfter(lockDoc(request.auth.uid))
+        && getAfter(lockDoc(request.auth.uid)).data.orderId == orderId
+        && existsAfter(/databases/$(database)/documents/orders/$(orderId)/private/contact);
+    }
+    function orderTransition() {
+      let cur = resource.data.status;
+      let nxt = request.resource.data.status;
+      let lockGone = !existsAfter(lockDoc(resource.data.clientUid));
+      return request.resource.data.updatedAt == request.time && (
+        // customer cancels while still unconfirmed
+        (signedIn() && resource.data.clientUid == request.auth.uid && active()
+          && cur == 'placed' && nxt == 'cancelled' && lockGone
+          && changed().hasOnly(['status', 'updatedAt']))
+        // staff confirms or rejects after the phone call
+        || (isAdmin() && cur == 'placed' && nxt == 'confirmed' && lockGone
+          && changed().hasOnly(['status', 'confirmedAt', 'confirmedBy', 'updatedAt'])
+          && request.resource.data.confirmedBy == request.auth.uid
+          && request.resource.data.confirmedAt == request.time)
+        || (isAdmin() && cur == 'placed' && nxt == 'rejected' && lockGone
+          && changed().hasOnly(['status', 'rejectReason', 'updatedAt'])
+          && request.resource.data.rejectReason is string
+          && request.resource.data.rejectReason.size() >= 1
+          && request.resource.data.rejectReason.size() <= 200)
+        // chef
+        || (isChef() && cur == 'confirmed' && nxt == 'preparing'
+          && changed().hasOnly(['status', 'prepMinutes', 'updatedAt'])
+          && request.resource.data.prepMinutes is int
+          && request.resource.data.prepMinutes >= 5 && request.resource.data.prepMinutes <= 120)
+        || (isChef() && cur == 'preparing' && nxt == 'ready'
+          && changed().hasOnly(['status', 'readyAt', 'updatedAt'])
+          && request.resource.data.readyAt == request.time)
+        // delivery person claims, then delivers
+        || (isCourier() && cur == 'ready' && nxt == 'out_for_delivery'
+          && changed().hasOnly(['status', 'courierUid', 'updatedAt'])
+          && request.resource.data.courierUid == request.auth.uid)
+        || (isCourier() && cur == 'out_for_delivery' && nxt == 'delivered'
+          && resource.data.courierUid == request.auth.uid
+          && changed().hasOnly(['status', 'updatedAt']))
+        // admin overrides
+        || (isAdmin() && cur in ['confirmed', 'preparing', 'ready', 'out_for_delivery'] && nxt == 'cancelled'
+          && changed().hasOnly(['status', 'updatedAt']))
+        || (isAdmin() && cur == 'ready' && nxt == 'out_for_delivery'
+          && changed().hasOnly(['status', 'courierUid', 'updatedAt'])
+          && request.resource.data.courierUid is string
+          && get(userDoc(request.resource.data.courierUid)).data.role == 'delivery')
+        || (isAdmin() && cur == 'out_for_delivery' && nxt == 'delivered'
+          && changed().hasOnly(['status', 'updatedAt']))
+      );
+    }
+
+    match /orders/{orderId} {
+      allow read: if signedIn() && (
+        resource.data.clientUid == request.auth.uid
+        || isAdmin()
+        || (isChef() && resource.data.status in ['confirmed', 'preparing', 'ready'])
+        || (isCourier() && (resource.data.status in ['confirmed', 'preparing', 'ready']
+                            || resource.data.courierUid == request.auth.uid)));
+      allow create: if active() && validNewOrder(request.resource.data, orderId);
+      allow update: if orderTransition();
+      allow delete: if false;
+
+      // Customer contact details: name, phone, address. Kept apart so the chef
+      // never sees them and a delivery person sees them only after claiming.
+      match /private/{docId} {
+        allow get: if docId == 'contact' && signedIn() && (
+          get(orderDoc(orderId)).data.clientUid == request.auth.uid
+          || isAdmin()
+          || (isCourier() && get(orderDoc(orderId)).data.courierUid == request.auth.uid));
+        allow create: if docId == 'contact' && active()
+          && !exists(orderDoc(orderId))
+          && existsAfter(orderDoc(orderId))
+          && getAfter(orderDoc(orderId)).data.clientUid == request.auth.uid
+          && request.resource.data.keys().hasOnly(['name', 'phone', 'address', 'lat', 'lng'])
+          && request.resource.data.keys().hasAll(['name', 'phone', 'address'])
+          && validName(request.resource.data.name)
+          && validPhone(request.resource.data.phone)
+          && request.resource.data.address is string
+          && request.resource.data.address.size() >= 5 && request.resource.data.address.size() <= 250
+          && (!('lat' in request.resource.data) || (request.resource.data.lat is number && request.resource.data.lat >= -90 && request.resource.data.lat <= 90))
+          && (!('lng' in request.resource.data) || (request.resource.data.lng is number && request.resource.data.lng >= -180 && request.resource.data.lng <= 180));
+        // Only after the order is finished, so the address cannot vanish mid-delivery.
+        allow delete: if docId == 'contact' && signedIn()
+          && get(orderDoc(orderId)).data.clientUid == request.auth.uid
+          && get(orderDoc(orderId)).data.status in ['delivered', 'cancelled', 'rejected'];
+      }
+    }
+  }
+}

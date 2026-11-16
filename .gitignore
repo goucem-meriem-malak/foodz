@@ -1,0 +1,64 @@
+# ---- Secrets and local config: NEVER commit ----
+.env
+.env.*
+!.env.example
+env.json
+secrets/*
+!secrets/*.example.json
+keys.json
+*.pem
+*.key
+*.p12
+*.pfx
+google-services.json
+GoogleService-Info.plist
+firebase_options.dart
+serviceAccount*.json
+firebase-adminsdk*.json
+*.jks
+*.keystore
+key.properties
+*.mobileprovision
+local.properties
+.firebaserc
+supabase/.env
+supabase/.temp/
+web/firebase-messaging-sw.js
+
+# ---- Generated code ----
+lib/l10n/gen/
+
+# ---- Flutter / Dart ----
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+android/.gradle/
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/app/debug/
+android/app/profile/
+android/app/release/
+
+# ---- Node (rules tests) ----
+node_modules/
+
+# ---- Firebase local ----
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# ---- IDE, OS, logs ----
+.idea/
+.vscode/
+*.iml
+*.log
+.DS_Store
+Thumbs.db

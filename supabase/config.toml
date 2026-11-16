@@ -1,0 +1,5 @@
+project_id = "foodz"
+
+# The function checks the Firebase ID token itself, so Supabase's own JWT check is off.
+[functions.notify-order]
+verify_jwt = false
