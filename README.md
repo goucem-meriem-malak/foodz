@@ -10,7 +10,7 @@
   <img alt="Flutter" src="https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white" />
   <img alt="Firebase" src="https://img.shields.io/badge/Firebase-FFCA28?logo=firebase&logoColor=black" />
   <img alt="Supabase" src="https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white" />
-  <img alt="Languages" src="https://img.shields.io/badge/languages-AR%20%7C%20FR%20%7C%20EN-CC3654" />
+  <img alt="Languages" src="https://img.shields.io/badge/languages-AR%20%7C%20FR%20%7C%20EN-DC0A22" />
   <img alt="License" src="https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey" />
 </p>
 

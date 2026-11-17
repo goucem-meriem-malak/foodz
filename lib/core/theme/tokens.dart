@@ -41,7 +41,7 @@ abstract final class Layout {
   static const double minTouch = 48;
 }
 
-/// Colours derived from the logo: bun orange, tomato, patty crimson, lettuce green.
+/// Colours derived from the logo: signal red (primary) and flame orange (accent) on near-black.
 /// Contrast checked against WCAG AA (see docs/DOCUMENTATION.md).
 @immutable
 class FoodzPalette extends ThemeExtension<FoodzPalette> {
@@ -78,15 +78,15 @@ class FoodzPalette extends ThemeExtension<FoodzPalette> {
   final Color onError;
 
   static const FoodzPalette light = FoodzPalette(
-    bg: Color(0xFFFFF8F0),
+    bg: Color(0xFFFFF7F5),
     surface: Color(0xFFFFFFFF),
-    surfaceTonal: Color(0xFFFFEFDD),
-    primary: Color(0xFFCC3654),
+    surfaceTonal: Color(0xFFFFE9E4),
+    primary: Color(0xFFDC0A22),
     onPrimary: Color(0xFFFFFFFF),
-    accent: Color(0xFFFFB466),
-    onAccent: Color(0xFF3B1D00),
-    text: Color(0xFF2B1B16),
-    textMuted: Color(0xFF6E5D55),
+    accent: Color(0xFFFD610E),
+    onAccent: Color(0xFF2B0E00),
+    text: Color(0xFF2B1716),
+    textMuted: Color(0xFF6B5755),
     outline: Color(0x14000000),
     success: Color(0xFF1B7F37),
     warning: Color(0xFFB45309),
@@ -95,15 +95,15 @@ class FoodzPalette extends ThemeExtension<FoodzPalette> {
   );
 
   static const FoodzPalette dark = FoodzPalette(
-    bg: Color(0xFF17100E),
-    surface: Color(0xFF211815),
-    surfaceTonal: Color(0xFF2C201C),
-    primary: Color(0xFFFF9AA3),
-    onPrimary: Color(0xFF3A0A14),
-    accent: Color(0xFFFFB466),
-    onAccent: Color(0xFF3B1D00),
-    text: Color(0xFFF8EEE8),
-    textMuted: Color(0xFFBDAAA1),
+    bg: Color(0xFF0E0A0A),
+    surface: Color(0xFF1A1212),
+    surfaceTonal: Color(0xFF251A1A),
+    primary: Color(0xFFFF5A66),
+    onPrimary: Color(0xFF2B0006),
+    accent: Color(0xFFFD610E),
+    onAccent: Color(0xFF2B0E00),
+    text: Color(0xFFF8EEEC),
+    textMuted: Color(0xFFBCA7A5),
     outline: Color(0x14FFFFFF),
     success: Color(0xFF4ADE80),
     warning: Color(0xFFFBBF24),

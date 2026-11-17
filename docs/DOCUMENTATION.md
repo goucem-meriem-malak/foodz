@@ -68,11 +68,11 @@ Delivery people see an order from `confirmed`, with the chef's time once it is k
 
 ## Design decisions
 
-- Palette from the logo: tomato-crimson primary, bun-orange accent, warm neutrals. Every text pair was calculated against WCAG AA (4.5:1) and passes in light and dark. `test/palette_contrast_test.dart` repeats the check.
+- Palette from the logo: signal-red primary (#DC0A22), flame-orange accent (#FD610E), near-black dark theme, warm neutrals. Every text pair was calculated against WCAG AA (4.5:1) and passes in light and dark. `test/palette_contrast_test.dart` repeats the check.
 - Airy, soft style: 16 to 20 px radii, hairline borders, tonal surfaces, decelerating motion (cubic-bezier 0.16, 1, 0.3, 1), reduced-motion respected.
 - Fonts: Cairo (Arabic and Latin) through `google_fonts`. Negative letter-spacing is applied to Latin only.
 - Spacing is a scale of multiples of 4. Touch targets are at least 48 px.
-- Splash: the native splash and the Flutter overlay share the same background colour and a 160 dp logo, so there is no jump. The logo builds up from the bottom with a spring settle and a light sweep, "Foodz" fades in 150 ms later, then a circular reveal opens the app. About 1.1 s in total, and it ends as soon as the session is known.
+- Splash: the native splash and the Flutter overlay share the same background colour and a 160 dp logo, so there is no jump. The logo rises from the bottom with a spring settle and a light sweep, "Foodz" fades in 150 ms later, then a circular reveal opens the app. About 1.1 s in total, and it ends as soon as the session is known.
 - Menu images go to Supabase Storage as you asked. Firestore roles cannot be read by Supabase, so uploads will go through a function that checks the role first (round 2).
 
 ## Known limits
