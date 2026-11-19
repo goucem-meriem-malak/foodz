@@ -284,3 +284,39 @@ test('customer can erase contact details only once the order is finished', async
   await assertFails(deleteDoc(doc(db, 'orders/active/private/contact')));
   await assertSucceeds(deleteDoc(doc(db, 'orders/done/private/contact')));
 });
+
+const settingsDoc = (over = {}) => ({
+  restaurantName: 'Dar Ennakhla',
+  deliveryFee: 200,
+  minOrder: 1000,
+  defaultPrepMinutes: 20,
+  acceptingOrders: true,
+  contactPhone: '',
+  contactEmail: '',
+  ...over,
+});
+
+test('an order is refused while the owner has stopped new orders', async () => {
+  await seedUser('cli');
+  await seed('settings/app', settingsDoc({ acceptingOrders: false }));
+  await assertFails(placeOrder(as('cli'), 'cli', 'o1'));
+});
+
+test('an order must use the configured delivery fee and minimum', async () => {
+  await seedUser('cli');
+  await seed('settings/app', settingsDoc({ deliveryFee: 300 }));
+  await assertFails(placeOrder(as('cli'), 'cli', 'o1')); // order says 200
+  await seed('settings/app', settingsDoc({ deliveryFee: 200, minOrder: 5000 }));
+  await assertFails(placeOrder(as('cli'), 'cli', 'o2')); // subtotal 1800 < 5000
+  await seed('settings/app', settingsDoc());
+  await assertSucceeds(placeOrder(as('cli'), 'cli', 'o3'));
+});
+
+test('the owner can save opening hours, other roles cannot', async () => {
+  await seedUser('own', 'owner');
+  await seedUser('adm', 'admin');
+  const full = (extra) => ({ ...settingsDoc(), updatedAt: serverTimestamp(), ...extra });
+  const hours = { 1: { closed: false, open: 660, close: 1380 } };
+  await assertSucceeds(setDoc(doc(as('own'), 'settings/app'), full({ hours })));
+  await assertFails(setDoc(doc(as('adm'), 'settings/app'), full({ hours })));
+});

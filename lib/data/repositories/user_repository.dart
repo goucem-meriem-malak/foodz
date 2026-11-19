@@ -44,15 +44,30 @@ class UserRepository {
         'termsAcceptedAt': FieldValue.serverTimestamp(),
       });
 
-  /// Removes the profile and the push tokens. Orders keep no contact details
-  /// (those are deleted with the account in the orders feature).
+  /// Removes the profile, the push tokens and the name, phone and address kept
+  /// with each finished order. The orders themselves stay (the restaurant needs
+  /// them for its accounts) but no longer point to a person's contact details.
+  /// Refuses while an order is still open: a courier may need that address.
   Future<void> deleteAllData(String uid) async {
+    final orders = await _db.collection('orders').where('clientUid', isEqualTo: uid).limit(400).get();
+    const finished = {'delivered', 'cancelled', 'rejected'};
+    if (orders.docs.any((o) => !finished.contains(o.data()['status']))) {
+      throw const ActiveOrderException();
+    }
     final devices = await _doc(uid).collection('devices').get();
     final batch = _db.batch();
+    for (final o in orders.docs) {
+      batch.delete(o.reference.collection('private').doc('contact'));
+    }
     for (final d in devices.docs) {
       batch.delete(d.reference);
     }
     batch.delete(_doc(uid));
     await batch.commit();
   }
+}
+
+/// Thrown when someone tries to delete their account while an order is in progress.
+class ActiveOrderException implements Exception {
+  const ActiveOrderException();
 }

@@ -20,6 +20,16 @@ dependencies:
   go_router: ^14.6.0
   google_fonts: ^6.2.1
   shared_preferences: ^2.3.0
+  http: ^1.2.2
+  image_picker: ^1.1.2
+  url_launcher: ^6.3.1
+  pdf: ^3.11.1
+  printing: ^5.13.2
+
+# image 4.11 does not compile against the archive versions pub picks (decodeLazy).
+# 4.5.4 is the last known good version; it is only used by the PDF/print packages.
+dependency_overrides:
+  image: 4.5.4
 
 dev_dependencies:
   flutter_test:

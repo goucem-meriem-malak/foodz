@@ -7,6 +7,7 @@ import '../../core/theme/tokens.dart';
 import '../../core/widgets/app_text_field.dart';
 import '../../core/widgets/status_banner.dart';
 import '../../data/providers.dart';
+import '../../data/repositories/user_repository.dart';
 
 Future<void> showDeleteAccountDialog(BuildContext context) {
   return showDialog<void>(context: context, builder: (_) => const _DeleteAccountDialog());
@@ -47,6 +48,8 @@ class _DeleteAccountDialogState extends ConsumerState<_DeleteAccountDialog> {
       final messenger = ScaffoldMessenger.of(context);
       Navigator.of(context).pop();
       messenger.showSnackBar(SnackBar(content: Text(l.accountDeleted)));
+    } on ActiveOrderException {
+      if (mounted) setState(() => _error = l.deleteBlockedActiveOrder);
     } on FirebaseAuthException catch (e) {
       if (mounted) setState(() => _error = authErrorMessage(l, e.code));
     } catch (_) {

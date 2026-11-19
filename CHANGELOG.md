@@ -1,6 +1,22 @@
 # Changelog
 
-## 1.0.0 (in progress, round 1 of 3)
+## 1.0.0 (build 3)
+
+- Dish photo upload (Supabase function `upload-image`, admin and owner only, JPG/PNG/WebP up to 1.5 MB).
+- Sales statistics screen for the owner.
+- Build number shown in Settings.
+
+## Earlier work in 1.0.0
+
+Added in round 2
+- Menu with categories, dishes, options and sold-out toggle; menu manager and dish editor for admin and owner.
+- Cart and checkout (cash on delivery, "we will call you" notice), one unconfirmed order per customer.
+- Orders: tracking, cancel while unconfirmed, half-page PDF receipt.
+- Staff screens: order board with confirm and reject, kitchen, delivery, people and roles, restaurant settings with opening hours.
+- Role-based navigation. Push request after every order change.
+- Rules: new orders must match the owner's settings (shop open, delivery fee, minimum). Deleting an account erases the contact details of finished orders and is refused while an order is open.
+
+## Round 1
 
 Added
 - Email/password and Google sign-in, email verification, password reset.
@@ -11,4 +27,4 @@ Added
 - Push notification registration on Android and web, and the `notify-order` server function.
 - Settings: language, theme, restaurant contact, legal texts.
 
-Next: menu, cart, orders and the staff screens (round 2); receipts, owner tools and polish (round 3).
+Next: polish and the remaining items listed in PROGRESS.md (round 3).

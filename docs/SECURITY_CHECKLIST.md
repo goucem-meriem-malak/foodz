@@ -10,7 +10,7 @@ Nothing was compiled or run in the build environment (no Flutter, no Firebase em
 | Permissions enforced in Firestore rules, not in the UI | Not verified | Rules written. Not run |
 | Rules tests (user A vs B, self-promotion, lock, courier access) | Not verified | `rules_tests/`. Written, not executed |
 | Input validation in rules (names, phone, prices, sizes) | Not verified | Written, not executed |
-| Order items content and prices | Outstanding | Rules check size and totals only. Server price check planned in round 2 |
+| Order items content and prices | Not verified | Rules check totals, delivery fee, minimum and shop open. They cannot check each dish price (rules have no loops), so staff verify the total during the confirmation call |
 | No self-promotion to admin or owner | Not verified | Rules and a test exist |
 | Staff powers require a verified email | Not verified | Rules and a test exist |
 | Customer contact details hidden from kitchen, shown to delivery only after claim | Not verified | Rules and tests exist |
@@ -24,7 +24,7 @@ Nothing was compiled or run in the build environment (no Flutter, no Firebase em
 | HTTPS only | Not verified | Firebase and Supabase endpoints are HTTPS by default |
 | Release build obfuscation, debug off | Not verified | Command in SETUP step 20 |
 | Android backup disabled | Not verified | SETUP step 8 |
-| Account deletion and data export | Outstanding | Profile and push tokens: implemented. Deleting the contact details of past orders arrives with the orders feature (round 2). The Privacy Policy already promises it |
+| Account deletion and data export | Not verified | Implemented: profile, push tokens and contact details of finished orders are deleted; refused while an order is open. Not run |
 | Dependencies audited and pinned | Outstanding | No network here. `pubspec.lock` is created by `flutter pub get` and must be committed |
 | Terms and Privacy accepted and versioned | Not verified | Version stored on the user, asked again when `LegalVersions.current` changes |
 | Terms and Privacy reviewed by a lawyer | Outstanding | Drafts, not legal advice |

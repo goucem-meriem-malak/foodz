@@ -13,6 +13,14 @@ abstract final class Env {
   static const String firebaseAuthDomain = String.fromEnvironment('FIREBASE_AUTH_DOMAIN');
   static const String vapidKey = String.fromEnvironment('FIREBASE_VAPID_KEY');
 
+  /// Address of the push server, for example
+  /// https://PROJECT-REF.supabase.co/functions/v1/notify-order. Public, not a secret.
+  static const String notifyUrl = String.fromEnvironment('NOTIFY_URL');
+
+  /// Address of the photo upload function, for example
+  /// https://PROJECT-REF.supabase.co/functions/v1/upload-image. Public, not a secret.
+  static const String uploadUrl = String.fromEnvironment('UPLOAD_URL');
+
   /// Web and Windows share the Firebase "web app" registration.
   static String get _appId =>
       (kIsWeb || defaultTargetPlatform == TargetPlatform.windows) ? firebaseAppIdWeb : firebaseAppIdAndroid;

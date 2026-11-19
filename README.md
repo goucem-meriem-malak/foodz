@@ -26,20 +26,25 @@
 
 ## Features
 
-Built (round 1)
-- Sign in with email or Google, email verification, password reset
-- Profile, export my data, delete my account
-- Terms of Use and Privacy Policy (AR / FR / EN), accepted again whenever the version changes
-- Five roles with permissions enforced by Firestore rules: client, admin, owner, chef, delivery
-- Premium design system from the logo, light and dark, full right-to-left layout
-- Animated launch screen
-- Push notifications for orders, also when the app is closed (Android and web)
+Customers
+- Menu by category with photos, dish options (size, extras), sold-out dishes, opening hours
+- Cart, checkout with the "we will call you to confirm" notice, cash on delivery
+- Dish photo upload and owner sales statistics
+- Order tracking with live status, half-page PDF receipt (save or print)
+- Guests can browse the menu; an account is needed to order
 
-Coming (rounds 2 and 3)
-- Menu with categories, dish options, sold-out toggle and opening hours
-- Cart, checkout with the "we will call you to confirm" notice, order tracking
-- Admin call-and-confirm screen, kitchen screen, delivery screen, owner tools
-- Half-page PDF receipt that can be saved and printed
+Restaurant team
+- Admin and owner: live order board, call and confirm or reject with a reason, assign a delivery person, cancel
+- Chef: kitchen screen, accept and choose a preparation time (the delivery person sees it), mark ready
+- Delivery: upcoming orders with the ready time, take an order, see the address after taking it, mark delivered
+- Owner: restaurant settings (fee, minimum, hours, switch to stop orders), menu, people and roles
+- Push notifications for every step, also when the app is closed (Android and web)
+
+Accounts and safety
+- Email or Google sign-in, email verification, password reset, export and delete my data
+- Terms of Use and Privacy Policy (AR / FR / EN), accepted again whenever the version changes
+- Five roles with permissions enforced by Firestore rules
+- Premium design system from the logo, light and dark, full right-to-left layout, animated launch screen
 
 ## Tech stack
 
@@ -57,7 +62,7 @@ Coming (rounds 2 and 3)
 lib/
   core/       theme, router, widgets, security, push, l10n helpers
   data/       models, repositories, providers
-  features/   auth, home, settings, legal, splash
+  features/   auth, menu, cart, orders, kitchen, delivery, admin, owner, settings, legal, splash
   l10n/       app_ar.arb, app_fr.arb, app_en.arb
 assets/       brand (logo, icons), legal (terms and privacy texts)
 docs/         DOCUMENTATION.md, SECURITY_CHECKLIST.md, legal copies

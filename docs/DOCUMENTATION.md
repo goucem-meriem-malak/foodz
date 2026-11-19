@@ -23,7 +23,7 @@ Configuration is passed at build time with `--dart-define-from-file=env.json`. T
 |---|---|---|
 | `users/{uid}` | name, phone, email, role, blocked, locale, termsVersion, termsAcceptedAt, createdAt | Role and blocked are never writable by the user |
 | `users/{uid}/devices/{token}` | platform, updatedAt | Push tokens. Removed at sign-out |
-| `settings/app` | restaurantName, deliveryFee, minOrder, defaultPrepMinutes, acceptingOrders, contactPhone, contactEmail | Public read, owner write |
+| `settings/app` | restaurantName, deliveryFee, minOrder, defaultPrepMinutes, acceptingOrders, contactPhone, contactEmail, hours (weekday 1-7: closed, open, close in minutes) | Public read, owner write |
 | `categories/{id}`, `dishes/{id}` | localized names (ar/fr/en), price (DZD, integer), options, available | Public read, admin write |
 | `orders/{id}` | clientUid, code, status, items, subtotal, deliveryFee, total, area, note, timestamps, courierUid, prepMinutes, rejectReason | No contact details here |
 | `orders/{id}/private/contact` | name, phone, address, lat, lng | Kept apart on purpose |
@@ -77,6 +77,9 @@ Delivery people see an order from `confirmed`, with the chef's time once it is k
 
 ## Known limits
 
-- Firestore rules check the shape and size of an order but cannot recalculate prices from the menu. A modified client could send wrong prices. Staff confirm every order by phone. Round 2 adds a server-side price check in the push function and a "price differs from menu" flag on the admin screen.
+- Firestore rules check the shape and size of an order but cannot recalculate prices from the menu. A modified client could send wrong prices. Staff confirm every order by phone. The rules do check the total, the delivery fee, the minimum order and that the shop is not switched off. A server-side price check against the menu is not built yet.
+- Opening hours are checked in the app with the phone's clock. The rules enforce only the owner's on/off switch, so a modified app could order outside the hours (staff can still reject it).
+- Dish photos are links. There is no upload screen yet: upload to a public Supabase Storage bucket and paste the link.
+- Android push shows in the notification shade with sound but not as a pop-up banner. Windows has no push.
 - Free tiers can change. Firestore Spark (about 50,000 reads and 20,000 writes per day) and Supabase free limits (500,000 function calls a month, projects pause after a week of no use) are from memory and not verified: check them before quoting a client. Supabase free has no backups. Firestore has no automatic backup on the free plan. Put this in the handover.
 - Costs. Developer: none. Client: none while inside the free tiers. Recurring risk: a paid plan is needed if traffic outgrows them.

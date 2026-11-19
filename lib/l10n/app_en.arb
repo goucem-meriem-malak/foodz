@@ -69,11 +69,13 @@
   "blockedBody": "Your account cannot place orders right now. Please contact the restaurant.",
   "homeGreeting": "Hello, {name}",
   "@homeGreeting": {
-    "placeholders": { "name": { "type": "String" } }
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "homeGreetingGuest": "What are you craving?",
-  "homeMenuSoonTitle": "The menu is on its way",
-  "homeMenuSoonBody": "Dishes and ordering arrive in the next build of this app.",
   "signInToOrder": "Sign in to order",
   "roleClient": "Customer",
   "roleAdmin": "Admin",
@@ -100,11 +102,355 @@
   "about": "About",
   "versionLabel": "Version {version}",
   "@versionLabel": {
-    "placeholders": { "version": { "type": "String" } }
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
   },
   "legalDraftNote": "Draft text, not legal advice. Have it reviewed before launch.",
   "setupIncompleteTitle": "Setup is not finished",
   "setupIncompleteBody": "Firebase settings are missing. Follow SETUP.md, then start the app with --dart-define-from-file=env.json.",
   "somethingWrongTitle": "Something went wrong",
-  "contactTitle": "Restaurant contact"
+  "contactTitle": "Restaurant contact",
+  "acceptingOrders": "Accepting orders",
+  "acceptingOrdersHelp": "Turn off to stop new orders right away.",
+  "addCategory": "Add category",
+  "addCategoryFirst": "Add a category first, then add dishes to it.",
+  "addChoice": "Add choice",
+  "addDish": "Add dish",
+  "addForPrice": "Add · {price}",
+  "@addForPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "addOptionGroup": "Add option group",
+  "addressHint": "Street, building, floor, landmark",
+  "addressLabel": "Full address",
+  "allCategories": "All",
+  "allowMultiple": "Customer can pick several",
+  "areaHint": "Neighbourhood or town",
+  "areaLabel": "Area",
+  "assignCourier": "Assign a delivery person",
+  "availableShort": "Available",
+  "availableToday": "Available today (turn off when sold out)",
+  "backToMenu": "Back to the menu",
+  "block": "Block",
+  "blockedTag": "Blocked",
+  "callName": "Call {name}",
+  "@callName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "callNoticeBody": "Before your order is prepared, someone from the restaurant will call this number to confirm it. Please keep your phone close.",
+  "callNoticeTitle": "We will call you to confirm",
+  "cancelByStaffBody": "The customer will be told the order was cancelled.",
+  "cancelOrderBody": "Your order has not been confirmed yet, so you can still cancel it.",
+  "cancelOrderButton": "Cancel order",
+  "cancelOrderTitle": "Cancel this order?",
+  "cartBar": "View cart ({count}) · {total}",
+  "@cartBar": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "cartEmptyBody": "Add a dish from the menu to start.",
+  "cartEmptyTitle": "Your cart is empty",
+  "cartTitle": "Your cart",
+  "categoriesTitle": "Categories",
+  "categoryHasDishes": "This category still has dishes. Move or delete them first.",
+  "categoryLabel": "Category",
+  "categoryRequired": "Choose a category",
+  "categoryVisible": "Visible to customers",
+  "changeRole": "Change role",
+  "checkout": "Checkout",
+  "checkoutTitle": "Confirm your order",
+  "choiceNameLabel": "Choice name",
+  "chooseAny": "Choose any",
+  "chooseOne": "Choose one",
+  "clearCart": "Empty cart",
+  "closedBanner": "We are not taking orders right now. You can still browse the menu.",
+  "closedShort": "Closed",
+  "collectCash": "Collect {amount} in cash",
+  "@collectCash": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmOrder": "Confirm",
+  "contactEmailLabel": "Contact email",
+  "contactPhoneLabel": "Contact phone",
+  "customerLabel": "Customer",
+  "dayClosed": "Closed",
+  "dayMon": "Monday",
+  "dayTue": "Tuesday",
+  "dayWed": "Wednesday",
+  "dayThu": "Thursday",
+  "dayFri": "Friday",
+  "daySat": "Saturday",
+  "daySun": "Sunday",
+  "decrease": "Decrease quantity",
+  "defaultPrepLabel": "Default preparation time (minutes)",
+  "deleteBlockedActiveOrder": "You have an order in progress. Delete your account once it is finished.",
+  "deleteDish": "Delete dish",
+  "deleteDishBody": "This removes the dish from the menu. Past orders keep their copy.",
+  "deleteDishTitle": "Delete this dish?",
+  "deliveryDone": "Done",
+  "deliveryEmptyBody": "New deliveries show up here as soon as the restaurant confirms them.",
+  "deliveryEmptyTitle": "No deliveries right now",
+  "deliveryFee": "Delivery",
+  "deliveryFeeLabel": "Delivery fee (DA)",
+  "deliveryOnMyWay": "On my way",
+  "deliveryReadyNow": "Ready to pick up",
+  "deliveryTo": "Delivery to",
+  "deliveryUpcoming": "Coming up",
+  "dishNameRequired": "Enter a name in at least one language",
+  "dishNotFound": "Dish not found",
+  "dishUnavailable": "{name} is no longer available. Remove it from your cart.",
+  "@dishUnavailable": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "editCategory": "Edit category",
+  "editDish": "Edit dish",
+  "errImageUrl": "Enter a link that starts with https://",
+  "errNumberRange": "Enter a number from {min} to {max}",
+  "@errNumberRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "errOrderDenied": "The order was refused. The restaurant may be closed, or you may already have an order waiting for confirmation.",
+  "errOrderFailed": "We could not place your order. Check your connection and try again.",
+  "errPrice": "Enter a price from 0 to 1,000,000",
+  "errSave": "Could not save. Please try again.",
+  "errTooShortOrLong": "Check the length of this text",
+  "extraPriceLabel": "Extra price (DA)",
+  "fieldDescription": "Description ({language})",
+  "@fieldDescription": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "fieldName": "Name ({language})",
+  "@fieldName": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "groupNameLabel": "Group name (for example Size)",
+  "guestBanner": "Sign in to place an order.",
+  "hiddenTag": "Hidden",
+  "hoursHelp": "Customers can order only during these hours. Use the switch to close a whole day.",
+  "hoursTitle": "Opening hours",
+  "imageUrlHelper": "Optional. A link to a photo, starting with https://",
+  "imageUrlLabel": "Photo link",
+  "incomingConfirmed": "Confirmed. Get ready.",
+  "increase": "Increase quantity",
+  "keepOrder": "Keep order",
+  "kitchenCooking": "Cooking",
+  "kitchenEmptyBody": "Confirmed orders appear here.",
+  "kitchenEmptyTitle": "No orders to prepare",
+  "kitchenReady": "Ready",
+  "kitchenToCook": "To prepare",
+  "markDelivered": "Mark as delivered",
+  "markReady": "Mark ready",
+  "menuEmptyBody": "The restaurant is still adding dishes. Check back soon.",
+  "menuEmptyTitle": "No dishes yet",
+  "minOrderLabel": "Minimum order (DA)",
+  "minOrderNotice": "The minimum order is {amount}.",
+  "@minOrderNotice": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "minutesShort": "{minutes} min",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "navDeliveries": "Deliveries",
+  "navKitchen": "Kitchen",
+  "navMenu": "Menu",
+  "navOrders": "Orders",
+  "navRestaurant": "Restaurant",
+  "navTeam": "People",
+  "newKitchenOrder": "New order #{code} to prepare",
+  "@newKitchenOrder": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "newOrderAlert": "New order #{code}",
+  "@newOrderAlert": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "noActiveOrders": "No orders in progress",
+  "noCouriers": "No delivery people yet. The owner can give someone the delivery role in People.",
+  "noDishesBody": "Add your first dish to build the menu.",
+  "noDishesTitle": "No dishes yet",
+  "noHistory": "No finished orders yet",
+  "noNewOrders": "No new orders. You will be alerted when one arrives.",
+  "noPeople": "Nobody found",
+  "noteLabel": "Note",
+  "numberCopied": "Number copied. Paste it in your phone app.",
+  "optionRequired": "Choose an option for {group}",
+  "@optionRequired": {
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "optionRequiredTag": "Required",
+  "optionsHelp": "Optional. Add sizes, extras or sauces. Each group can be required or optional.",
+  "optionsInvalid": "Each option group needs a name and at least one choice with a name.",
+  "optionsTitle": "Options",
+  "orderNotFound": "Order not found",
+  "orderNumber": "Order #{code}",
+  "@orderNumber": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "orderReadyAlert": "Order #{code} is ready for pickup",
+  "@orderReadyAlert": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "ordersEmptyBody": "Your orders will show up here.",
+  "ordersEmptyTitle": "No orders yet",
+  "ordersTitle": "My orders",
+  "payCashNotice": "Pay {amount} in cash to the delivery person.",
+  "@payCashNotice": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "payOnDelivery": "Cash on delivery",
+  "placeOrder": "Place order",
+  "prepTimeTitle": "How long will it take?",
+  "priceLabel": "Price (DA)",
+  "quantity": "Quantity",
+  "readyAround": "Ready around {time}",
+  "@readyAround": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "readyAroundMinutes": "Ready around {time} (in {minutes} min)",
+  "@readyAroundMinutes": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "reasonLabel": "Reason: {reason}",
+  "@reasonLabel": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptButton": "Receipt (PDF)",
+  "receiptPayment": "Payment: cash on delivery",
+  "receiptThanks": "Thank you for your order!",
+  "receiptTitle": "Receipt",
+  "rejectHint": "Reason shown to the customer",
+  "rejectOrder": "Reject",
+  "rejectTitle": "Reject this order",
+  "removeChoice": "Remove choice",
+  "removeGroup": "Remove group",
+  "restaurantNameLabel": "Restaurant name",
+  "savedMessage": "Saved",
+  "searchPeople": "Search by name, email or phone",
+  "signInToSeeOrders": "Sign in to see your orders",
+  "soldOut": "Sold out",
+  "startCooking": "Start cooking",
+  "statusCancelled": "Cancelled",
+  "statusConfirmed": "Confirmed",
+  "statusDelivered": "Delivered",
+  "statusOutForDelivery": "On its way",
+  "statusPlaced": "Waiting for confirmation",
+  "statusPreparing": "Being prepared",
+  "statusReady": "Ready",
+  "statusRejected": "Not accepted",
+  "subtotal": "Subtotal",
+  "tabHistory": "History",
+  "tabInProgress": "In progress",
+  "tabNew": "New",
+  "takeDelivery": "Take this delivery",
+  "takeFailed": "Someone else took this order.",
+  "teamHelp": "Give a registered person a role. They must have created an account and verified their email first.",
+  "total": "Total",
+  "unblock": "Unblock",
+  "uncategorized": "Without category",
+  "waitingForCall": "We will call you soon to confirm your order.",
+  "waitingForPickup": "Waiting for the delivery person",
+  "yesCancel": "Yes, cancel",
+  "choosePhoto": "Choose photo",
+  "changePhoto": "Change photo",
+  "photoFailed": "Photo upload failed. Use a JPG, PNG or WebP under 1.5 MB.",
+  "photoNotConfigured": "Photo upload is not set up. Add UPLOAD_URL to env.json, or paste an image link.",
+  "statsTitle": "Sales",
+  "statsToday": "Today",
+  "stats7": "7 days",
+  "stats30": "30 days",
+  "statsOrders": "Delivered orders",
+  "statsRevenue": "Revenue",
+  "statsAverage": "Average order",
+  "statsTopDishes": "Best sellers",
+  "statsNoData": "No delivered orders in this period.",
+  "statsNote": "Counts delivered orders only. Up to the latest 500.",
+  "statsOpen": "Sales statistics"
 }

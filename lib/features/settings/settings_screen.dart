@@ -11,7 +11,7 @@ import 'delete_account_dialog.dart';
 import 'edit_profile_sheet.dart';
 import 'export_data_sheet.dart';
 
-const appVersion = '1.0.0';
+const appVersion = '1.0.0 (build 3)';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});

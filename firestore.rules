@@ -132,7 +132,7 @@ service cloud.firestore {
 
     // ================= Restaurant settings (public read, owner write) =================
     function validSettings(d) {
-      return d.keys().hasOnly(['restaurantName', 'deliveryFee', 'minOrder', 'defaultPrepMinutes', 'acceptingOrders', 'contactPhone', 'contactEmail', 'updatedAt'])
+      return d.keys().hasOnly(['restaurantName', 'deliveryFee', 'minOrder', 'defaultPrepMinutes', 'acceptingOrders', 'contactPhone', 'contactEmail', 'hours', 'updatedAt'])
         && d.keys().hasAll(['restaurantName', 'deliveryFee', 'minOrder', 'defaultPrepMinutes', 'acceptingOrders', 'contactPhone', 'contactEmail', 'updatedAt'])
         && d.restaurantName is string && d.restaurantName.size() >= 1 && d.restaurantName.size() <= 60
         && d.deliveryFee is int && d.deliveryFee >= 0 && d.deliveryFee <= 10000
@@ -141,6 +141,7 @@ service cloud.firestore {
         && d.acceptingOrders is bool
         && d.contactPhone is string && d.contactPhone.size() <= 20
         && d.contactEmail is string && d.contactEmail.size() <= 100
+        && (!('hours' in d) || (d.hours is map && d.hours.size() <= 7))
         && d.updatedAt == request.time;
     }
     match /settings/{docId} {
@@ -166,6 +167,16 @@ service cloud.firestore {
     // ================= Orders =================
     // Statuses: placed -> confirmed -> preparing -> ready -> out_for_delivery -> delivered
     //           placed -> rejected | cancelled; admin can cancel before delivery.
+    function settingsDoc() { return /databases/$(database)/documents/settings/app; }
+    // New orders must match the owner's settings: shop not switched off, delivery
+    // fee as configured, minimum order respected. Item prices cannot be checked
+    // here (rules have no loops); staff verify the total during the confirmation call.
+    function matchesSettings(d) {
+      return !exists(settingsDoc())
+        || (get(settingsDoc()).data.acceptingOrders != false
+            && d.deliveryFee == get(settingsDoc()).data.deliveryFee
+            && d.subtotal >= get(settingsDoc()).data.minOrder);
+    }
     function validNewOrder(d, orderId) {
       return d.keys().hasOnly(['clientUid', 'code', 'status', 'items', 'subtotal', 'deliveryFee', 'total', 'area', 'note', 'createdAt', 'confirmedAt', 'confirmedBy', 'prepMinutes', 'readyAt', 'courierUid', 'rejectReason', 'updatedAt'])
         && d.keys().hasAll(['clientUid', 'code', 'status', 'items', 'subtotal', 'deliveryFee', 'total', 'area', 'note', 'createdAt', 'confirmedAt', 'confirmedBy', 'prepMinutes', 'readyAt', 'courierUid', 'rejectReason', 'updatedAt'])
@@ -178,6 +189,7 @@ service cloud.firestore {
         && d.total is int && d.total == d.subtotal + d.deliveryFee && d.total <= 1000000
         && d.area is string && d.area.size() >= 2 && d.area.size() <= 60
         && d.note is string && d.note.size() <= 300
+        && matchesSettings(d)
         && d.createdAt == request.time && d.updatedAt == request.time
         && d.confirmedAt == null && d.confirmedBy == null && d.prepMinutes == null
         && d.readyAt == null && d.courierUid == null && d.rejectReason == null

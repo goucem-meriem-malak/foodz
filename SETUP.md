@@ -9,7 +9,9 @@
 | 3 | Supabase secret `FIREBASE_SERVICE_ACCOUNT` | Service account JSON (step 17) | | **Yes**. Never in the repo |
 | 4 | `android/key.properties` and `upload.jks` (git-ignored) | Android signing key (step 19) | | **Yes** |
 | 5 | Firestore, document `users/<your uid>` | Set `role` to `owner` (step 16) | `owner` | |
-| 6 | Firestore, document `settings/app` | Restaurant name, phone, email. The owner screen for this arrives in round 2 | `Dar Ennakhla` | |
+| 6 | App, owner account, tab Restaurant | Restaurant name, delivery fee, minimum order, opening hours, contact | `Dar Ennakhla` | |
+| 8 | `env.json` | `NOTIFY_URL`: the address of the push function (step 17) | `https://PROJECT-REF.supabase.co/functions/v1/notify-order` | No, public address |
+| 9 | `env.json` | `UPLOAD_URL`: the address of the photo function (step 17) | `https://PROJECT-REF.supabase.co/functions/v1/upload-image` | No, public address |
 | 7 | Git, `user.email` | Your GitHub no-reply address, not your real email (step 21) | | |
 
 ## Steps
@@ -45,6 +47,7 @@
     cp env.example.json env.json
     ```
     (Windows: `copy env.example.json env.json`)
+    Leave `NOTIFY_URL` empty for now. You fill it in at step 17.
 15. Link and deploy the rules and indexes:
     ```
     firebase login
@@ -59,8 +62,11 @@
     4. Store it as a secret. Easiest: Supabase dashboard, Edge Functions, Secrets, add `FIREBASE_SERVICE_ACCOUNT` and paste the whole file content as the value.
        Terminal alternative (PowerShell): `npx supabase secrets set FIREBASE_SERVICE_ACCOUNT="$(Get-Content serviceAccount.json -Raw)"`, then type `y` when asked. If it cancels by itself, use the dashboard.
     5. Deploy: `npx supabase functions deploy notify-order`
-    6. Delete `serviceAccount.json` from your computer.
-    The app starts calling this function when orders are built (round 2). Windows has no push support, so staff on Windows see orders live while the app is open.
+    6. In the Supabase dashboard open Edge Functions, `notify-order`, and check that the "Verify JWT" switch is **off**. The function checks the Firebase login itself. If it is on, every call is refused. (The file `supabase/config.toml` already turns it off when you deploy.)
+    7. Put the function address in `env.json` as `NOTIFY_URL`: `https://YOUR-PROJECT-REF.supabase.co/functions/v1/notify-order`. The project ref is in the Supabase dashboard URL.
+    8. Dish photos: deploy the second function with `npx supabase functions deploy upload-image`. It needs no extra secret (Supabase provides its own storage key). Check that "Verify JWT" is **off** here too, then add `"UPLOAD_URL": "https://YOUR-PROJECT-REF.supabase.co/functions/v1/upload-image"` to `env.json`. The first upload creates the public `dishes` bucket by itself.
+    9. Delete `serviceAccount.json` from your computer.
+    Windows has no push support, so staff on Windows see orders live while the app is open.
 18. Create the icons, the native splash and the web push worker, then run:
     ```
     dart run flutter_launcher_icons
@@ -112,12 +118,22 @@
     Website: leave empty.
     Topics: `flutter`, `firebase`, `supabase`, `food-delivery`, `algeria`, `riverpod`, `rtl`, `arabic`, `firestore`, `fcm`
 
+## First use (after step 18)
+
+1. Sign in as the owner. You land on the order board. Open the Restaurant tab: set the delivery fee, minimum order, opening hours and contact, then Save. Orders are refused until the restaurant is open.
+2. Open the Menu tab: add a category, then add dishes (names in Arabic, French and English, price, optional options such as sizes). Tap "Choose photo" in the dish form to upload a picture (JPG, PNG or WebP, up to 1.5 MB). If `UPLOAD_URL` is not set, paste an image link instead.
+3. Open the People tab: find a registered person and give them the chef, delivery or admin role. They must create an account and verify their email first.
+4. The Restaurant tab also opens Sales statistics (delivered orders, revenue, average, best sellers).
+5. Test the whole flow with three accounts: a customer places an order, the owner or admin calls and confirms it, the chef sets the preparation time and marks it ready, the delivery person takes it and marks it delivered.
+
 ## If a key leaked
 
 1. Rotate first. Firebase API key: restrict or regenerate it in Google Cloud console, Credentials. Service account: delete the key in Google Cloud console, create a new one, update the Supabase secret (step 17).
 2. Then remove it from history with [git filter-repo](https://github.com/newren/git-filter-repo) and force-push.
 
 ## Common errors
+
+- You still see an old screen ("menu is on its way"): you are running an old copy. Delete the old folder, extract the new ZIP, run `flutter clean`, `flutter pub get`, uninstall the app from the phone, and run again. Settings must show "Version 1.0.0 (build 3)".
 
 - `Target of URI doesn't exist: .../app_localizations.dart`: run `flutter pub get`. The texts are generated.
 - App shows "Setup is not finished": start it with `--dart-define-from-file=env.json`.

@@ -1,24 +1,22 @@
 # Progress
 
-## Done (round 1)
-- Project config, `.gitignore`, license, brand assets, icon and splash config
-- Firestore rules for all roles and the order state machine, plus rules tests
-- Auth (email, Google), email verification, profile gate, terms gate, blocked screen
-- Design system, three languages with RTL, animated splash, settings, legal texts (AR/FR/EN)
-- Push client (token registration) and the `notify-order` server function
-- Unit tests, README, SETUP, DOCUMENTATION, SECURITY_CHECKLIST
+## Done
+- Round 1: project, rules, accounts, design, launch screen, settings, legal texts, push registration and the `notify-order` function.
+- Round 2: menu and dish options, menu manager and dish editor, cart, checkout, order tracking, PDF receipt, order board with confirm and reject, kitchen, delivery, people and roles, restaurant settings with opening hours, role-based navigation, rules that match orders to the owner's settings, contact details erased with the account.
 
-## Remaining
-Round 2: menu (categories, dishes, options, sold out), restaurant settings screen with opening hours (rules and model need an `hours` field), cart and checkout with the "we will call you to confirm" notice, order tracking, admin, chef and delivery screens, calling `notify-order` after every order change, Supabase image upload function, deleting order contact details on account deletion, server price check.
-Round 3: PDF half-page receipt (save and print), owner tools (staff roles, stats), polish, final scan.
+## Not built yet
+- Dish photo upload (photos are links for now).
+- Server-side check of dish prices against the menu.
+- Sales numbers (stats) for the owner.
+- High-importance Android notification channel (pop-up banner).
+- Real-device checks: the splash handoff, push when the app is closed, the receipt on a printer.
 
 ## Next step
-Say "continue" to start round 2.
+Run the app (SETUP steps 1 to 18), do the "First use" section, then send me the first error or screen that looks wrong. Say "continue" for the items above.
 
 ## Known issues
-- Nothing was compiled or run. First run may need small fixes. Start with `flutter pub get`, `flutter analyze`, `flutter test`.
+- Nothing was compiled or run here (no Flutter). The first run may show small compile errors. Start with `flutter pub get`, `flutter analyze`, `flutter test`, and send me the output.
 - `pubspec.lock` is not included. Package versions are ranges.
+- Rules tests were never run. Run `firebase emulators:exec --only firestore "npm test"` inside `rules_tests` after `npm install`.
 - Platform folders (android, web, windows) are created by `flutter create` (SETUP step 4).
-- Legal texts describe the finished app (orders, map position). Re-read them after round 3.
-- Android push uses the default Firebase channel: sound and notification shade, no pop-up banner. A high-importance channel is added in round 2 together with the order screens.
-- Rules and rules tests were never run. Run `firebase emulators:exec --only firestore "npm test"` inside `rules_tests` after `npm install`.
+- Legal texts describe the finished app. Re-read them before launch and have a lawyer review them.

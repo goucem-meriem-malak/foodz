@@ -87,8 +87,8 @@ class AuthRepository {
     } else {
       await user.reauthenticateWithProvider(GoogleAuthProvider());
     }
-    await _push.unregister(user.uid);
     await _users.deleteAllData(user.uid);
+    await _push.unregister(user.uid);
     await user.delete();
   }
 }
